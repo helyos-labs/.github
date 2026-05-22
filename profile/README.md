@@ -6,8 +6,6 @@
   <img alt="NexaNet" src="assets/black_logo.png" width="200">
 </picture>
 
-# NexaNet
-
 **Simple distributed container orchestration.**
 **80% of Kubernetes use-cases with 20% of the complexity.**
 
