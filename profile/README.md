@@ -53,7 +53,6 @@ Helyos supports both Docker and containerd as container runtimes, with automatic
 | [`helyos-core`](https://github.com/helyos-labs/helyos-core) | Core library -- domain types, port traits, actor-model orchestrator |
 | [`helyosd`](https://github.com/helyos-labs/helyosd) | Daemon -- runtime adapters, REST API, cluster management, networking |
 | [`helyos-cli`](https://github.com/helyos-labs/helyos-cli) | CLI tool -- deploy, scale, and manage containers from the terminal |
-| [`helyos-proxy`](https://github.com/helyos-labs/helyos-proxy) | Reverse proxy -- HTTP/HTTPS routing with weighted load balancing |
 
 ## Quick Start
 
@@ -85,7 +84,7 @@ helyos status
 - **Multi-node clustering** -- join workers with a single token, automatic pod rescheduling on node failure
 - **Built-in service discovery** -- embedded DNS server resolves `<service>.<project>.internal`
 - **Automatic TLS** -- Let's Encrypt integration with certificate auto-renewal
-- **Reverse proxy** -- nginx, Caddy, Traefik, or the built-in helyos-proxy as backends
+- **Reverse proxy** -- nginx, Caddy, Traefik as backends
 - **Project isolation** -- logical namespaces with suspend, resume, and resource management
 - **Encrypted secrets** -- AES-256-GCM at rest with per-node master keys
 - **Health checking** -- HTTP, TCP, and exec probes with configurable thresholds
