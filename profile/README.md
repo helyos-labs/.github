@@ -16,6 +16,8 @@ Helyos is a lightweight container orchestration platform built from the ground u
 
 Where Kubernetes requires a constellation of control-plane components and years of expertise to operate well, Helyos ships as two binaries: `helyosd` (the daemon) and `helyos` (the CLI). Deploy services with familiar YAML specs, scale across nodes with a single join command, and let the built-in reverse proxy handle TLS certificates automatically. No etcd, no kubelet, no YAML-of-YAML.
 
+The control plane is secure by default: the daemon serves an HTTPS REST API with multi-user API tokens, generating a self-signed certificate and a CLI context on first run so local use needs zero configuration. Point `helyos` at a remote cluster with `helyos login <server>`, which pins the daemon's CA and stores a named, kubectl-style connection context.
+
 Helyos supports both Docker and containerd as container runtimes, with automatic detection at startup. Its hexagonal architecture cleanly separates domain logic from infrastructure, making it straightforward to extend with new backends and adapters.
 
 ## Architecture
@@ -23,10 +25,10 @@ Helyos supports both Docker and containerd as container runtimes, with automatic
 ```
                          helyos (CLI)
                             |
-                        HTTP REST API
+                   HTTPS REST API + token auth
                             |
     +--------------------------------------------------+
-    |                    helyosd                          |
+    |                    helyosd                       |
     |                                                  |
     |   Orchestrator (actor model)                     |
     |       |          |          |          |         |
@@ -40,9 +42,9 @@ Helyos supports both Docker and containerd as container runtimes, with automatic
     |                          |traefik|               |
     |                          +-------+               |
     +--------------------------------------------------+
-              |                           |
-        helyos-core                    helyos-proxy
-    (shared types & traits)    (HTTP/HTTPS reverse proxy)
+                            |
+                       helyos-core
+                  (shared types & traits)
 ```
 
 ## Repositories
@@ -60,7 +62,8 @@ Helyos supports both Docker and containerd as container runtimes, with automatic
 # Install Helyos
 curl -sSfL https://raw.githubusercontent.com/helyos-labs/helyos/main/install.sh | sh
 
-# Start the daemon
+# Start the daemon -- it auto-generates an API token, a self-signed
+# certificate, and a local CLI context on first run
 helyosd
 
 # Deploy your first service
@@ -76,20 +79,25 @@ EOF
 
 helyos deploy app.yaml
 helyos status
+
+# Talk to a remote cluster: pin its CA and store a named context
+helyos login https://cluster.example.com:6443
 ```
 
 ## Key Features
 
 - **Single binary daemon** -- no external dependencies beyond Docker or containerd
+- **Secure-by-default control plane** -- HTTPS REST API, multi-user API tokens, self-signed cert auto-generated (or bring your own)
+- **kubectl-style remote control** -- `helyos login` pins the daemon CA and stores named connection contexts
 - **Multi-node clustering** -- join workers with a single token, automatic pod rescheduling on node failure
-- **Built-in service discovery** -- embedded DNS server resolves `<service>.<project>.internal`
-- **Automatic TLS** -- Let's Encrypt integration with certificate auto-renewal
+- **Built-in service discovery** -- embedded DNS server resolves `<deployment>.<project>.internal`
+- **Automatic TLS for services** -- ACME (Let's Encrypt) provisioning with certificate auto-renewal
 - **Reverse proxy** -- nginx, Caddy, Traefik as backends
 - **Project isolation** -- logical namespaces with suspend, resume, and resource management
 - **Encrypted secrets** -- AES-256-GCM at rest with per-node master keys
-- **Health checking** -- HTTP, TCP, and exec probes with configurable thresholds
+- **Health checking** -- HTTP probes with configurable thresholds and automatic restart
 - **Weighted scheduling** -- spread or bin-pack strategies across heterogeneous nodes
-- **WireGuard overlay** -- encrypted cross-node networking with automatic subnet allocation
+- **WireGuard overlay** (experimental) -- encrypted cross-node networking with automatic subnet allocation
 - **Runtime flexibility** -- Docker and containerd support with automatic detection
 
 ## License
