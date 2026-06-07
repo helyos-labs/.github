@@ -20,42 +20,6 @@ The control plane is secure by default: the daemon serves an HTTPS REST API with
 
 Helyos supports both Docker and containerd as container runtimes, with automatic detection at startup. Its hexagonal architecture cleanly separates domain logic from infrastructure, making it straightforward to extend with new backends and adapters.
 
-## Architecture
-
-```
-                         helyos (CLI)
-                            |
-                   HTTPS REST API + token auth
-                            |
-    +--------------------------------------------------+
-    |                    helyosd                       |
-    |                                                  |
-    |   Orchestrator (actor model)                     |
-    |       |          |          |          |         |
-    |   Scheduler   Health    Events    Secrets        |
-    |       |       Checker   Watcher   (AES-256)      |
-    |       |          |          |                     |
-    |   +------+  +--------+  +-------+  +--------+   |
-    |   |Docker|  |  SQLite |  | Proxy |  |Cluster |   |
-    |   |contrd|  |  State  |  | nginx |  |  gRPC  |   |
-    |   +------+  +--------+  | caddy |  +--------+   |
-    |                          |traefik|               |
-    |                          +-------+               |
-    +--------------------------------------------------+
-                            |
-                       helyos-core
-                  (shared types & traits)
-```
-
-## Repositories
-
-| Repository | Description |
-|:--|:--|
-| [`helyos`](https://github.com/helyos-labs/helyos) | Meta-repository -- documentation, design specs, and implementation plans |
-| [`helyos-core`](https://github.com/helyos-labs/helyos-core) | Core library -- domain types, port traits, actor-model orchestrator |
-| [`helyosd`](https://github.com/helyos-labs/helyosd) | Daemon -- runtime adapters, REST API, cluster management, networking |
-| [`helyos-cli`](https://github.com/helyos-labs/helyos-cli) | CLI tool -- deploy, scale, and manage containers from the terminal |
-
 ## Quick Start
 
 ```bash
